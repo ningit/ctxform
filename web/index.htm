@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Equivalence checker for LTL with contexts</title>
+	<link rel="stylesheet" href="index.css">
+	<script src="index.js"></script>
+</head>
+<body onload="initialSetup()">
+	<table id="input-table">
+		<tr><td><input placeholder="First formula" type="text" id="left-formula"/></td></tr>
+		<tr><td><input placeholder="Second formula" type="text" id="right-formula"/><td></tr>
+	</table>
+
+<b id="res-message"></b><br>
+<div id="result" style="display: none;">
+	<div class="word" id="lword-div">L\R = <span id="lword"></span><br></div>
+	<div class="word" id="rword-div">R\L = <span id="rword"></span><br></div>
+	<br>
+
+	<details id="witnesses-block">
+	<summary>Counterexample</summary>
+		<table class="info-table">
+			<thead>
+				<tr><td>Variable</td><td>Replacement</td></tr>
+			</thead>
+			<tbody id="witnesses">
+			</tbody>
+		</table>
+
+		Format: <select id="witness-format" onchange="updateWitnesses()">
+		<option value="raw">Simplified</option>
+		<option value="spot">Spot</option>
+		<option value="unsimp">Unsimplified</option>
+		<option value="math">MathML</option>
+	</select>
+	</details>
+	<details id="raw-formulae">
+	<summary>Raw formula</summary>
+		<table class="info-table">
+			<thead>
+				<tr><td>Formula</td><td>Generated formula</td></tr>
+			</thead>
+			<tbody>
+				<tr><td>L</td><td id="lformula"></td></tr>
+				<tr><td>R</td><td id="rformula"></td></tr>
+				<tr><td>C</td><td id="cformula"></td></tr>
+			</tbody>
+		</table>
+	</details>
+	<details id="spot-formulae">
+	<summary>Simplified formula</summary>
+		<table class="info-table">
+			<thead>
+				<tr><td>Formula</td><td>Simplified formula</td></tr>
+			</thead>
+			<tbody>
+				<tr><td>L</td><td id="lformula_spot"></td></tr>
+				<tr><td>R</td><td id="rformula_spot"></td></tr>
+				<tr><td>C</td><td id="cformula_spot"></td></tr>
+			</tbody>
+		</table>
+	</details>
+	<details id="automata-info">
+	<summary>Automaton size</summary>
+		<table class="info-table">
+			<thead>
+				<tr><td>Automaton</td><td>Number of states</td></tr>
+			</thead>
+			<tbody>
+				<tr><td>L</td><td id="lsize"></td></tr>
+				<tr><td>R</td><td id="rsize"></td></tr>
+				<tr><td>¬ L</td><td id="nlsize"></td></tr>
+				<tr><td>¬ R</td><td id="nrsize"></td></tr>
+				<tr><td>C</td><td id="csize"></td></tr>
+			</tbody>
+		</table>
+	</details>
+</div>
+	<div id="controls">
+	<span id="working" style="display: none;">⏳</span>
+	<span class="icon-button" onclick="copyFormulas()">📝</span>
+	<span class="icon-button" onclick="copyURI()">🔗</span>
+	<select id="logic" onchange="checkEquivalence()">
+		<option value="ltl">LTL</option>
+		<option value="bool">Boolean</option>
+		<option value="ctl">CTL</option>
+	</select>
+	<input type="checkbox" id="monotonic" checked onchange="checkEquivalence()"/><label for="monotonic">Monotonic</label>
+	<select id="formulas">
+		<option value="5" data-left="f[GF p]" data-right="((GF p) & f[true]) | f[false]">RS5</option>
+		<option value="6" data-left="f[FG p]" data-right="((FG p) & f[true]) | f[false]">RS6</option>
+		<option value="7" data-left="GF f[a W b]" data-right="(GF f[a U b]) | ((FG a) & (GF f[true]))">RS7</option>
+		<option value="8" data-left="FG f[a U b]" data-right="((GF b) & FG f[a W b]) | FG f[false]">RS8</option>
+		<option value="9" data-left="h W g[a U b]" data-right="(h U g[a U b]) | G h">RS9</option>
+		<option value="10" data-left="h[a U b] W g" data-right="((GF b) & (h[a W b] W g)) | (h[a U b] U (g | G h[false]))">RS10</option>
+		<option value="11" data-left="f[p]" data-right="p & f[true] | !p & f[false]">Shannon</option>
+		<option value="12" data-left="G f[p]" data-right="f[p]">G</option>
+	</select>
+	</div>
+</body>
+</html>

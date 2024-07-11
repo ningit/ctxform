@@ -1,0 +1,102 @@
+html {
+	height: 100%;
+	font-family: sans-serif;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+}
+
+#input-table {
+	padding-top: 2%;
+	text-align: center;
+	width: 100%;
+}
+
+#input-table input {
+	width: 100%;
+	font-size: 150%;
+	border: none;
+	border-bottom: 1px solid magenta;
+	text-align: center;
+}
+
+#input-table input:focus {
+	border: none;
+	border-bottom: 2px solid magenta;
+	background-color: rgba(255, 0, 255, 0.2);;
+	outline: none;
+}
+
+.info-table {
+	margin: 1ex auto 1ex auto;
+	border-collapse: collapse;
+}
+
+details summary {
+	font-size: small;
+}
+
+.info-table thead {
+	font-size: small;
+}
+
+.info-table thead td {
+	padding-left: 1ex;
+	padding-right: 1ex;
+}
+
+.info-table tbody tr:nth-child(even) {
+	background: beige;
+}
+
+.info-table tbody tr:nth-child(odd) {
+	background: lightyellow;
+}
+
+.info-table td {
+	border: 1px solid lightgray;
+}
+
+#result {
+	margin-top: 1ex;
+	text-align: center;
+}
+
+.word {
+	padding-top: 1ex;
+	padding-bottom: 1ex;
+	display: none;
+}
+
+#controls {
+	position: absolute;
+	top: 1ex;
+	right: 1ex;
+}
+
+#formulas {
+	font-size: small;
+	margin-left: 1ex;
+}
+
+.icon-button {
+	cursor: pointer;
+}
+
+.math-var {
+	color: green;
+	font-family: sans-serif;
+}
+
+.tempop {
+	font-weight: bold;
+}
+
+#res-message {
+	text-align: center;
+	display: block;
+	width: 100%;
+	margin-top: 2%;
+}

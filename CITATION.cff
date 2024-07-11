@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+authors:
+- family-names: Rubio
+  given-names: Rubén
+  orcid: https://orcid.org/0000-0003-2983-3404
+title: Equivalence checker for contextural formulas
+version: 1.0.0
+date-released: 2024-06-24
+url: https://github.com/ningit/ctxform
+preferred-citation:
+  type: conference-paper
+  doi: 10.4230/LIPIcs.CONCUR.2024.11
+  authors:
+    - family-names: Esparza
+      given-names: Javier
+      orcid: https://orcid.org/0000-0001-9862-4919
+    - family-names: Rubio
+      given-names: Rubén
+      orcid: https://orcid.org/0000-0003-2983-3404
+  title: Validity of contextual formulas
+  conference:
+    name: 35th International Conference on Concurrency Theory (CONCUR) 2024
+    date-end: 2024-09-13
+  year: 2024
+  month: 9
+  start: 11:1
+  end: 11:20
+  volume: 311
+  collection-title: LIPIcs
+  publisher:
+    name: Schloss Dagstuhl - Leibniz-Zentrum für Informatik

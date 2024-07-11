@@ -1,0 +1,34 @@
+[project]
+name = 'ctxform'
+version = '1.0.0'
+description = 'Equivalence checker for contextual formulas'
+license.text = 'GPLv3'
+classifiers = [
+	'Programming Language :: Python :: 3',
+	'Intended Audience :: Science/Research',
+	'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+	'Topic :: Scientific/Engineering',
+	'Operating System :: OS Independent',
+]
+requires-python = '>=3.10'
+dependencies = ['lark']
+
+[project.optional-dependencies]
+bool = ['python-sat']
+# ltl = ['spot'] # PyPI's spot is not that Spot
+webui = ['tornado']
+
+[[project.authors]]
+name = "Rubén Rubio"
+email = "rubenrub@ucm.es"
+
+[project.readme]
+content-type = 'text/markdown'
+text = '''# Equivalence checker for contextual formulas
+
+Check whether two formulas with contexts are equivalent in propositional
+logic, LTL, or CTL for monotonic or general contexts.
+'''
+
+[tool.setuptools]
+packages = ['ctxform']

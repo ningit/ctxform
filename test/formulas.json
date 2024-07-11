@@ -1,0 +1,88 @@
+{
+	"bool": {
+		"Shannon": [
+			"f[p]",
+			"p & f[true] | !p & f[false]"
+		],
+		"Shannon2": [
+			"f[p]",
+			"p & f[true] | f[false]"
+		],
+		"fand": [
+			"f[a & b]",
+			"f[a] & f[b]"
+		],
+		"iter": [
+			"f[f[a]]",
+			"f[a]"
+		],
+		"subs0": [
+			"a <-> b",
+			"f[a] <-> f[b]"
+		],
+		"impl0": [
+			"a -> b",
+			"f[a] -> f[b]"
+		]
+	},
+	"ltl": {
+		"GFup": [
+			"f[GF p]",
+			"((GF p) & f[true]) | f[false]"
+		],
+		"FGup": [
+			"f[FG p]",
+			"((FG p) & f[true]) | f[false]"
+		],
+		"GFW": [
+			"GF f[a W b]",
+			"(GF f[a U b]) | ((FG a) & (GF f[true]))"
+		],
+		"FGU": [
+			"FG f[a U b]",
+			"((GF b) & FG f[a W b]) | FG f[false]"
+		],
+		"WU": [
+			"h W f[a U b]",
+			"(h U f[a U b]) | G h"
+		],
+		"UW": [
+			"f[a U b] W g",
+			"((GF b) & (f[a W b] W g)) | (f[a U b] U (g | G f[false]))"
+		],
+		"fWU": [
+			"f[a W b]",
+			"f[a U b]"
+		],
+		"subs": [
+			"G (a <-> b)",
+			"G (f[a] <-> f[b])"
+		],
+		"impl": [
+			"G (a -> b)",
+			"G (f[a] -> f[b])"
+		]
+	},
+	"ctl": {
+		"impl0": [
+			"a -> b",
+			"f[a] -> f[b]"
+		],
+		"impl": [
+			"AG (a -> b)",
+			"AG (f[a] -> f[b])"
+		],
+		"iter": [
+			"f[f[a]]",
+			"f[a]"
+		]
+	},
+	"import": {
+		"ltl": [
+			"bool"
+		],
+		"ctl": [
+			"bool"
+		]
+	}
+}

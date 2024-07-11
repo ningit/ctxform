@@ -1,0 +1,123 @@
+{
+	"ltl": {
+		"GFup1": [
+			"f[GF p]",
+			"((FG p) & f[true]) | f[false]"
+		],
+		"GFup2": [
+			"f[GF p]",
+			"((GF p) & f[true]) | f[p]"
+		],
+		"GFup3": [
+			"f[GF p]",
+			"((GF p) | f[true]) & f[false]"
+		],
+		"GFup4": [
+			"f[GF p]",
+			"((GF p) & f[false]) | f[true]"
+		],
+		"FGup1": [
+			"f[FG p]",
+			"((GF p) & f[true]) | f[false]"
+		],
+		"FGup2": [
+			"f[FG p]",
+			"((FG p) & f[true]) | f[p]"
+		],
+		"FGup3": [
+			"f[FG p]",
+			"((FG p) | f[true]) & f[false]"
+		],
+		"FGup4": [
+			"f[FG p]",
+			"((FG p) & f[false]) | f[true]"
+		],
+		"GFW1": [
+			"GF f[a W b]",
+			"(GF f[a W b]) | ((FG a) & (GF f[true]))"
+		],
+		"GFW2": [
+			"GF f[a W b]",
+			"(GF f[a U b]) | ((GF a) & (GF f[true]))"
+		],
+		"GFW3": [
+			"GF f[a W b]",
+			"(GF f[a U b]) | ((FG a) & (f[true]))"
+		],
+		"GFW4": [
+			"GF f[a W b]",
+			"(GF f[a U b]) & ((FG a) | (GF f[true]))"
+		],
+		"FGU1": [
+			"FG f[a U b]",
+			"((FG b) & FG f[a W b]) | FG f[false]"
+		],
+		"FGU2": [
+			"FG f[a U b]",
+			"((GF b) & GF f[a W b]) | FG f[false]"
+		],
+		"FGU3": [
+			"FG f[a U b]",
+			"((GF b) & FG f[a U b]) | FG f[false]"
+		],
+		"FGU4": [
+			"FG f[a U b]",
+			"((GF b) & FG f[a W b]) | f[false]"
+		],
+		"FGU5": [
+			"FG f[a U b]",
+			"((GF b) | FG f[a W b]) & FG f[false]"
+		],
+		"WU1": [
+			"h W f[a U b]",
+			"(h U f[a W b]) | G h"
+		],
+		"WU2": [
+			"h W f[a U b]",
+			"(h W f[a U b]) | G h"
+		],
+		"WU3": [
+			"h W f[a U b]",
+			"(h U f[a U b]) | F h"
+		],
+		"WU4": [
+			"h W f[a U b]",
+			"(h U f[a U b]) & G h"
+		],
+		"WU5": [
+			"h W f[a U b]",
+			"(h U f[a U h]) | G b"
+		],
+		"UW1": [
+			"f[a U b] W g",
+			"((FG b) & (f[a W b] W g)) | (f[a U b] U (g | G f[false]))"
+		],
+		"UW2": [
+			"f[a U b] W g",
+			"((GF b) & (f[a U b] W g)) | (f[a U b] U (g | G f[false]))"
+		],
+		"UW3": [
+			"f[a U b] W g",
+			"((GF b) & (f[a W b] U g)) | (f[a U b] U (g | G f[false]))"
+		],
+		"UW4": [
+			"f[a U b] W g",
+			"((GF b) & (f[a W b] W g)) | (f[a W b] U (g | G f[false]))"
+		],
+		"UW5": [
+			"f[a U b] W g",
+			"((GF b) & (f[a W b] W g)) | (f[a U b] U (g | f[false]))"
+		],
+		"UW6": [
+			"f[a U b] W g",
+			"((GF b) & (f[a W b] W g)) | (f[a U b] U (g | G f[true]))"
+		],
+		"UW7": [
+			"f[a U b] W g",
+			"((GF b) & (f[a W b] W g)) | (f[a U b] W (g | G f[false]))"
+		]
+	},
+	"bool": {},
+	"ctl": {},
+	"import": {}
+}
