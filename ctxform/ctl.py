@@ -6,6 +6,7 @@ import subprocess
 
 from .common import Op, Problem, instantiate_formula
 from .transform import InvalidFormulaError
+from .tfsimp import simplify
 
 # Temporal operators
 TEMPORAL = frozenset({Op.NEXT, Op.EVENTUALLY, Op.ALWAYS, Op.UNTIL, Op.WUNTIL, Op.RELEASE, Op.SRELEASE})
@@ -220,6 +221,9 @@ class CTLProblem(Problem):
 				raise InvalidFormulaError(f'{name} equation is not valid CTL: {ife}')
 
 		super().__init__(_adapt_ctl(left), _adapt_ctl(right), CTLSpec, any_formula=any_formula)
+
+		# Simplify the CTL condition (CTL-SAT will not do it)
+		self.gen_cond = simplify(self.gen_cond, {})
 
 		# Remove equivalences introduced by the transformation
 		if any_formula:

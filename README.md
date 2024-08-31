@@ -1,6 +1,6 @@
 # Equivalence checker for contextual formulas
 
-This is an equivalence checker for contextual formulas in propositional logic, LTL, and CTL. Contextual formulas extend ordinary formulas with expressions *c*\[φ\], where *c* is a context variable and φ is a contextual formula. Contexts are ordinary formulas with a special variable \[\], the *hole*, and contextual formula is instantiated with a context for each context variable *c* by replacing *c*\[φ\] expressions with the context where the hole is in turn replaced by φ.  Two contextual formulas are equivalent if all their instantiations are equivalent as ordinary formulas.
+This is an equivalence checker for contextual formulas in propositional logic, LTL, and CTL. Contextual formulas extend ordinary formulas with expressions *c*\[φ\], where *c* is a context variable and φ is a contextual formula. Contexts are ordinary formulas with a special variable \[\], the *hole*, and a contextual formula is instantiated with a context for each context variable *c* by replacing *c*\[φ\] expressions with the context where the hole is in turn replaced by φ.  Two contextual formulas are equivalent if all their instantiations are equivalent as ordinary formulas.
 
 The tool's output indicates whether the equivalence holds, one formula implies the other, or they are unrelated. When there is no equivalence, a counterexample is obtained and consists of a context (simplified from the canonical context in the reference) and a valuation or counterexample trace for the propositional variables. Satisfiability and validity can be checked using the constant formulas `true` and `false`.
 
@@ -23,9 +23,9 @@ The tool requires Python 3.10 or a more recent version to run. Morever, it depen
 * [`lark`](https://github.com/lark-parser/lark) (for parsing, can be installed with `pip install lark`).
 * [`pysat`](https://pysathq.github.io/) (for propositional logic, can be install with `pip install python-sat`).
 * [`spot`](https://spot.lre.epita.fr/) (for LTL, instructions to install are available in https://spot.lre.epita.fr/install.html).
-* [`clt-sat`](https://github.com/nicolaprezza/CTLSAT) (for CTL, a single binary that can be built from source). Our took will look for the binary in the `bin` subdirectory of the current working directory. Some binaries are available in the release section of this repository.
+* [`clt-sat`](https://github.com/nicolaprezza/CTLSAT) (for CTL, a single binary that can be built from source). Our tool will look for the binary in the `bin` subdirectory of the current working directory. Some binaries are available in the release section of this repository.
 
-For the web interface, [`tornado`](https://www.tornadoweb.org/) (which can be installed with `pip install tornado`) is also required.
+The last three packages are only required if the corresponding logic is used. For the web interface, [`tornado`](https://www.tornadoweb.org/) (which can be installed with `pip install tornado`) is also required.
 
 
 Benchmarks
@@ -39,4 +39,4 @@ Time and memory bounds can be adjusted with `--timeout` and `--memlimit`.
 References
 ----------
 
-* Javier Esparza, Rubén Rubio. [*Validity of contextual formulas*](https://doi.org/10.4230/LIPIcs.CONCUR.2024.11). CONCUR 2024. LIPIcs 311 (article 11). [Extended version](https://doi.org/10.48550/arXiv.2407.07759) on arXiv.
+* Javier Esparza, Rubén Rubio. [*Validity of contextual formulas*](https://doi.org/10.4230/LIPIcs.CONCUR.2024.24). CONCUR 2024. LIPIcs 311 (article 24). [Extended version](https://doi.org/10.48550/arXiv.2407.07759) on arXiv.

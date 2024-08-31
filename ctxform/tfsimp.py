@@ -53,7 +53,7 @@ def simplify(formula, valuation):
 			pass
 
 		case Op.CTX:
-			args[1] = simplify(formula, valuation)
+			args[1] = simplify(args[1], valuation)
 
 		case _:
 			args = [simplify(arg, valuation) for arg in args]
@@ -157,4 +157,4 @@ def simplify(formula, valuation):
 			elif _is_true(args[1]):
 				return Op.EVENTUALLY, args[0]
 
-	return formula
+	return head, *args

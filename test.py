@@ -3,9 +3,7 @@
 #
 # Uses systemd and Linux's cgroups v2 to limit time and memory usage for each
 # test case, so it only works under Linux. systemd 255 or above is required
-# to measure the peak memory usage. dbus-python is used to connect with systemd.
-#
-# The implementation is rudimentary and relies on some unstrustworthy timeouts.
+# to measure the peak memory usage. pystemd is used to connect with systemd.
 #
 
 import json
@@ -13,7 +11,12 @@ import math
 import time
 from multiprocessing import Process, Pipe, connection
 
-import dbus
+import pystemd
+
+# Some signatures we need are missing from Pystemd
+from pystemd.systemd1.unit_signatures import KNOWN_UNIT_SIGNATURES
+KNOWN_UNIT_SIGNATURES[b'AddRef'] = b'b'
+KNOWN_UNIT_SIGNATURES[b'PIDs'] = b'au'
 
 from ctxform.logics import PROBLEM_CLASS, PARSER_CLASS
 from ctxform.ltl import LTLProblem
@@ -178,7 +181,7 @@ def formula_depth(form):
 class ControlledRunner:
 	"""Run functions in a controlled environment"""
 
-	def __init__(self, memory_limit=4000000000, time_limit=600, scope_name='ctxform-test.scope'):
+	def __init__(self, memory_limit=4000000000, time_limit=600, scope_name=b'ctxform-test.scope'):
 
 		# Memory limit in bytes
 		self.memory_limit = memory_limit
@@ -188,19 +191,21 @@ class ControlledRunner:
 		self.scope_name = scope_name
 
 		# Connect to the user session bus
-		self.bus = dbus.SessionBus()
-		systemd = self.bus.get_object('org.freedesktop.systemd1', '/org/freedesktop/systemd1')
+		self.bus = pystemd.dbuslib.DBus(user_mode=True)
+		self.bus.open()
+		# Manager to connect with the user session systemd
+		self.manager = pystemd.systemd1.Manager(bus=self.bus)
+		self.manager.load()
 
 		# Check systemd version for compatibility
-		version = str(dbus.Interface(systemd, dbus_interface='org.freedesktop.DBus.Properties').Get(
-			'org.freedesktop.systemd1.Manager', 'Version'))
+		version = self.manager.Version.decode('utf-8')
 		self.recent_enough = int(version.split('.', maxsplit=1)[0]) >= 255
 
 		if not self.recent_enough:
 			print(f'Using systemd version {version} while memory peak measurement requires systemd 255 or above.')
 
-		# Manager to connect with the user session systemd
-		self.manager = dbus.Interface(systemd, dbus_interface='org.freedesktop.systemd1.Manager')
+	def __del__(self):
+		self.bus.close()
 
 	def run(self, func, args=()):
 		"""Run a function in the controlled environment"""
@@ -210,28 +215,28 @@ class ControlledRunner:
 		process = Process(target=self.target, args=(child_conn, func, args))
 		process.start()
 
-		properties = [
-			('Description', 'Test scope for ctxform'),
-			('PIDs', [dbus.UInt32(process.pid)]),
-			('MemoryMax', dbus.UInt64(self.memory_limit)),
-			('MemorySwapMax', dbus.UInt64(0)),
-			# ('RuntimeMaxUSec', dbus.UInt64(self.time_limit * 1000000)),
-		]
+		properties = {
+			'Description': 'Test scope for ctxform',
+			'PIDs': [process.pid],
+			'MemoryMax': self.memory_limit,
+			'MemorySwapMax': 0,
+			# 'RuntimeMaxUSec': self.time_limit * 1000000,  # done by wait
+			'AddRef': True,
+		}
 
 		# Start a scope where to confine the process and let it go on
-		job = self.manager.StartTransientUnit(self.scope_name, 'fail', properties, ())
-		job_iface = dbus.Interface(self.bus.get_object('org.freedesktop.systemd1', job),
-		                           'org.freedesktop.DBus.Properties')
+		self.manager.Manager.StartTransientUnit(self.scope_name, b'fail', properties, ())
 
 		# Wait until the unit is active to start the process
-		unit = self.bus.get_object('org.freedesktop.systemd1', self.manager.GetUnit('ctxform-test.scope'))
-		unit_props = dbus.Interface(unit, 'org.freedesktop.DBus.Properties')
+		unit = pystemd.systemd1.Unit(self.scope_name, bus=self.bus)
+		unit.load()
+		unit.Unref()  # removes the reference from AddRef
 
-		while unit_props.Get('org.freedesktop.systemd1.Unit', 'ActiveState') != 'active':
+		while unit.ActiveState != b'active':
 			time.sleep(0.25)
 
 		# Send a message to start the actual algorithm (otherwise the process
-		# will start unconfined and the measures will be accurate)
+		# will start unconfined and the measures will be inaccurate)
 		parent_conn.send('start')
 
 		# Wait until the process has finished, successfully or not
@@ -241,19 +246,18 @@ class ControlledRunner:
 
 		# Process does not finish in time
 		if not ready:
-			memory_peak = int(unit_props.Get('org.freedesktop.systemd1.Scope', 'MemoryPeak')) if self.recent_enough else -1
-			cpu_usage = int(unit_props.Get('org.freedesktop.systemd1.Scope', 'CPUUsageNSec'))
+			memory_peak = unit.MemoryPeak if self.recent_enough else -1
+			cpu_usage = unit.CPUUsageNSec
 
 			# Kill the unit
-			unit.Kill('all', dbus.UInt32(9), dbus_interface='org.freedesktop.systemd1.Unit')
-			time.sleep(5)
+			unit.Kill(b'all', 9)
 
-			return dict(ok=False, cpu_usage=cpu_usage, memory_peak=memory_peak, reason='timeout')
+			result = dict(ok=False, cpu_usage=cpu_usage, memory_peak=memory_peak, reason='timeout')
 
 		# Process has finished successfully
 		elif ready[0] != process.sentinel:
-			memory_peak = int(unit_props.Get('org.freedesktop.systemd1.Scope', 'MemoryPeak')) if self.recent_enough else -1
-			cpu_usage = int(unit_props.Get('org.freedesktop.systemd1.Scope', 'CPUUsageNSec'))
+			memory_peak = unit.MemoryPeak if self.recent_enough else -1
+			cpu_usage = unit.CPUUsageNSec
 
 			# Result contains the time measures by the child process
 			result = parent_conn.recv()
@@ -262,28 +266,28 @@ class ControlledRunner:
 			parent_conn.send('ok')
 			process.join()
 
-			# Wait until the unit gets inactive
-			state = str(unit_props.Get('org.freedesktop.systemd1.Unit', 'ActiveState'))
-
-			while state == 'active':
-				time.sleep(0.25)
-				state = str(unit_props.Get('org.freedesktop.systemd1.Unit', 'ActiveState'))
-
-			return dict(ok=True, cpu_usage=cpu_usage, memory_peak=memory_peak, result=result)
+			result = dict(ok=True, cpu_usage=cpu_usage, memory_peak=memory_peak, result=result)
 
 		# Process has failed
 		else:
-			result = str(unit_props.Get('org.freedesktop.systemd1.Scope', 'Result'))
-			cpu_usage = int(unit_props.Get('org.freedesktop.systemd1.Scope', 'CPUUsageNSec'))
+			# Wait until systemd become aware of the failure
+			while unit.ActiveState == b'active':
+				time.sleep(0.25)
+
+			result = unit.Result
+			cpu_usage = unit.CPUUsageNSec
 
 			# Reset the failed unit to reuse it with the next test case
-			unit.ResetFailed(dbus_interface='org.freedesktop.systemd1.Unit')
+			unit.ResetFailed()
 			# result would be oom-killer (out of memory)
-			print(' ', result)
-			# Wait for some time
-			time.sleep(5)
 
-			return dict(ok=False, cpu_usage=cpu_usage, reason=result)
+			result = dict(ok=False, cpu_usage=cpu_usage, reason=result.decode())
+
+		# Wait until the unit gets inactive
+		while unit.ActiveState != b'inactive':
+			time.sleep(0.25)
+
+		return result
 
 	@staticmethod
 	def target(conn, func, args):
@@ -479,6 +483,7 @@ def main():
 
 		# Skip checking generated formulas
 		if args.skip_generated:
+			print()
 			return
 
 		# The rest are LTL cases

@@ -2,9 +2,6 @@
 # Common entry point for all logics
 #
 
-from .bool import BoolProblem
-from .ctl import CTLProblem
-
 from .parser import LTLParser, CTLParser
 
 
